@@ -49,6 +49,7 @@
      <Compile Include="Assets\Scripts\AirChannelControl.cs" />
      <Compile Include="Assets\Scripts\DoorControl.cs" />
      <Compile Include="Assets\Scripts\Switch.cs" />
+     <Compile Include="Assets\Scripts\TriggerButton.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>/opt/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
