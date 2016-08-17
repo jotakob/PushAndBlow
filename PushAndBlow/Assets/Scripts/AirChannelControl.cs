@@ -36,7 +36,6 @@ public class AirChannelControl : MonoBehaviour {
 	}
 
 	void add_object(Collider col){
-		Debug.Log ("added");
 		moveing.Add (col.attachedRigidbody);
 
 		var start = start_object.transform.position;
@@ -53,14 +52,13 @@ public class AirChannelControl : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
-
 		var velo = end - start;
 		velo.Normalize ();
 
 
 		foreach (var body in moveing) {
-			body.AddForce (velo * strength, ForceMode.VelocityChange);
+			var pro_velo = Vector3.Project (body.transform.position - start, velo)-(body.transform.position - start);
+			body.velocity = velo * strength + pro_velo;
 		}
 	}
 
@@ -76,6 +74,7 @@ public class AirChannelControl : MonoBehaviour {
 		Matrix4x4 rotationMatrix = Matrix4x4.TRS(center, Quaternion.LookRotation (end - start), Vector3.one);
 		Gizmos.matrix = rotationMatrix; 
 		Gizmos.DrawWireCube (Vector3.zero,new Vector3 (size, size,length));
+		Gizmos.matrix = Matrix4x4.identity; 
 
 	}
 }
