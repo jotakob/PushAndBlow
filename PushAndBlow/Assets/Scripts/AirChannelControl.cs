@@ -4,6 +4,11 @@ using System.Collections.Generic;
 
 public class AirChannelControl : MonoBehaviour {
 
+	public enum AirChannelMode{
+		IMPULSE,
+		CHANNEL
+	}
+
 	public GameObject start_object;
 	public GameObject end_object;
 	private GameObject air_collider;
@@ -15,6 +20,7 @@ public class AirChannelControl : MonoBehaviour {
 
 	public float size = 1;
 	public float strength = 1;
+	public AirChannelMode mode;
 
 	// Use this for initialization
 	void Start () {
@@ -52,10 +58,11 @@ public class AirChannelControl : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if (mode == AirChannelMode.IMPULSE)
+			return;
+		
 		var velo = end - start;
 		velo.Normalize ();
-
-
 		foreach (var body in moveing) {
 			var pro_velo = Vector3.Project (body.transform.position - start, velo)-(body.transform.position - start);
 			body.velocity = velo * strength + pro_velo;
