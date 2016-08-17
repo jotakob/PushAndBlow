@@ -22,6 +22,8 @@ public class AirChannelControl : MonoBehaviour {
 	public float strength = 1;
 	public AirChannelMode mode;
 
+	public ParticleSystem base_system_channel;
+
 	// Use this for initialization
 	void Start () {
 		if (!air_collider) {
@@ -39,6 +41,25 @@ public class AirChannelControl : MonoBehaviour {
 		var length = Vector3.Distance (start,end);
 		air_collider.transform.rotation = Quaternion.LookRotation (end - start);
 		air_box_collider.size = new Vector3 (size, size,length);
+
+		if (base_system_channel) {
+			ParticleSystem my_particles = (ParticleSystem)GameObject.Instantiate (base_system_channel);
+			my_particles.transform.parent = transform;
+			my_particles.transform.position = start_object.transform.position;
+			my_particles.transform.rotation = air_collider.transform.rotation;
+			my_particles.startSpeed = strength;
+			my_particles.startLifetime = length/strength;
+			if (mode == AirChannelMode.IMPULSE) {
+				my_particles.startLifetime = length / strength;
+				var vol = my_particles.velocityOverLifetime;
+				vol.enabled = true;
+
+				var col = my_particles.colorOverLifetime;
+				col.enabled = true;
+			}
+			var sh = my_particles.shape;
+			sh.box = new Vector3 (size, size, 0.2f);
+		}
 	}
 
 	void add_object(Collider col){
