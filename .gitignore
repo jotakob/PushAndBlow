@@ -1,11 +1,11 @@
 # =============== #
 # Unity generated #
 # =============== #
-[Tt]emp/
-[Oo]bj/
-[Bb]uild
-/[Ll]ibrary/
-sysinfo.txt
+PushAndBlow/[Tt]emp/
+PushAndBlow/[Oo]bj/
+PushAndBlow/[Bb]uild
+/PushAndBlow/Library/
+PushAndBlow/sysinfo.txt
 *.stackdump
  
 # ============================================= #
