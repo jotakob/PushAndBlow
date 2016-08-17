@@ -47,6 +47,8 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\AirChannel.cs" />
      <Compile Include="Assets\Scripts\AirChannelControl.cs" />
+     <Compile Include="Assets\Scripts\DoorControl.cs" />
+     <Compile Include="Assets\Scripts\Switch.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>/opt/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
