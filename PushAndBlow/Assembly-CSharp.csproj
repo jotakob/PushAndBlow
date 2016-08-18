@@ -47,6 +47,7 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\AirChannel.cs" />
      <Compile Include="Assets\Scripts\AirChannelControl.cs" />
+     <Compile Include="Assets\Scripts\Checkpoint.cs" />
      <Compile Include="Assets\Scripts\DoorControl.cs" />
      <Compile Include="Assets\Scripts\LoadOperations.cs" />
      <Compile Include="Assets\Scripts\MovingPlatform.cs" />

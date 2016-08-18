@@ -54,11 +54,20 @@ public class PlayerMovement : MonoBehaviour {
     CharacterController charController;
     public GameObject mesh;
 
+	Checkpoint last_checkpoint;
+
 
     // Use this for initialization
     void Start () {
         charController = GetComponent<CharacterController>();
         startPosition = transform.position;
+	}
+
+	void checkpoint(Checkpoint new_checkpoint){
+		if (last_checkpoint)
+			last_checkpoint.deactivate ();
+		last_checkpoint = new_checkpoint;
+		last_checkpoint.activate ();
 	}
 	
 	// Update is called once per frame
@@ -202,7 +211,7 @@ public class PlayerMovement : MonoBehaviour {
     
     public void kill()
     {
-        
+		transform.position = last_checkpoint.transform.position;
     }
 
 	void OnControllerColliderHit(ControllerColliderHit hit) {
