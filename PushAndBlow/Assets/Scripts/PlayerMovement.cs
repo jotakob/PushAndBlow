@@ -58,6 +58,8 @@ public class PlayerMovement : MonoBehaviour {
     GameObject mesh;
     GameObject mask;
 
+	Checkpoint last_checkpoint;
+
 
     // Use this for initialization
     void Start () {
@@ -67,8 +69,16 @@ public class PlayerMovement : MonoBehaviour {
         availableMasks.Add(Masks.StrongMask); // TEMP !!
         mesh = transform.FindChild("Mesh").gameObject;
         equipMask(Masks.NormalMask);
-        gravityStartTime = Time.time;
-    }
+		gravityStartTime = Time.time;
+	}
+
+
+	void checkpoint(Checkpoint new_checkpoint){
+		if (last_checkpoint)
+			last_checkpoint.deactivate ();
+		last_checkpoint = new_checkpoint;
+		last_checkpoint.activate ();
+	}
 	
 	// Update is called once per frame
 	void Update () {
@@ -257,7 +267,11 @@ public class PlayerMovement : MonoBehaviour {
     public void kill()
     {
         face(1);
-        this.transform.position = startPosition;
+		if(last_checkpoint){
+			transform.position = last_checkpoint.transform.position;
+		} else {
+        	this.transform.position = startPosition;
+		}
     }
 
     public void addMask(Masks newMask)
