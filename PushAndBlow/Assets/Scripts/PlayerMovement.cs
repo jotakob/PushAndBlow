@@ -68,9 +68,10 @@ public class PlayerMovement : MonoBehaviour {
         availableMasks.Add(Masks.NormalMask);
         availableMasks.Add(Masks.StrongMask); // TEMP !!
         mesh = transform.FindChild("Mesh").gameObject;
-        mask = mesh.transform.FindChild("Mask").gameObject;
         equipMask(Masks.NormalMask);
+		gravityStartTime = Time.time;
 	}
+
 
 	void checkpoint(Checkpoint new_checkpoint){
 		if (last_checkpoint)
