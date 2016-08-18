@@ -15,8 +15,13 @@ public class PlayerMovement : MonoBehaviour {
     public float decelerationTime = 0.2f;
     public AnimationCurve accelerationCurve;
     public AnimationCurve decelerationCurve;
+    public float rotationDelay = 1f;
     public float rotationTime = 0.2f;
-    
+    public float xHoverSpace = 0.1f;
+    public float yHoverSpace = 0.1f;
+    public AnimationCurve xHoverCurve;
+    public AnimationCurve yHoverCurve;
+
     float deadzone = 0.2f;
     int facing = 0;
     float gravity = 0f;
@@ -24,12 +29,14 @@ public class PlayerMovement : MonoBehaviour {
     bool isJumping = false;
     float offGroundCounter = 0;
     float jumpStart;
-    float lastMovement = 0;
+    float lastMovementSpeed = 0;
+    float lastMoveInput = 0;
     float lastMoveStart;
     float lastMoveStop;
-    float decDirection;
+    float decSpeed;
     float rotationStart = 0;
     float rotationStartTime;
+    float hoverTime = 0;
 
     CharacterController charController;
     public GameObject mesh;
@@ -44,35 +51,47 @@ public class PlayerMovement : MonoBehaviour {
 	void Update () {
 
         float dt = Time.deltaTime;
-        float x = 0;
-        float xMovement = Input.GetAxis("Horizontal");
-        if (xMovement != 0)
+
+        //Horizontal movement
+
+        float xAcceleration = 0;
+        float moveInput = Input.GetAxis("Horizontal");
+        if (moveInput != 0)
         {
-            if (lastMovement == 0 || Mathf.Sign(lastMovement) != Mathf.Sign(xMovement))
+            if (lastMoveInput == 0 || Mathf.Sign(lastMoveInput) != Mathf.Sign(moveInput))
             {
                 lastMoveStart = Time.time;
             }
             float accPoint = (Time.time - lastMoveStart) / accelerationTime;
-            x = xMovement * accelerationCurve.Evaluate(accPoint) * dt *  moveSpeed; //
+            xAcceleration = moveInput * accelerationCurve.Evaluate(accPoint) * moveSpeed;
         }
         else
         {
-            if (lastMovement != 0)
+            if (lastMoveInput != 0)
             {
                 lastMoveStop = Time.time;
-                decDirection = Mathf.Sign(lastMovement);
+                decSpeed = lastMovementSpeed;
             }
 
-            x = moveSpeed * decelerationCurve.Evaluate((Time.time - lastMoveStop) / decelerationTime) * dt * decDirection; 
+            // Curve value of                time difference         in relation to      reduced stopping time          times speed to slow down from
+            float decPoint = Mathf.Clamp01((Time.time - lastMoveStop) / decelerationTime);
+            Debug.Log("DecPoint: " + decPoint);
+            xAcceleration = decelerationCurve.Evaluate(decPoint) * decSpeed;
+            Debug.Log("Break: " + xAcceleration);
+            if ((Time.time - lastMoveStop) > rotationDelay && facing != 1)
+            {
+                face(1);
+            }
         }
+        float x = xAcceleration * dt;
 
 
-        if (xMovement < 0 && facing != 2)
+        if (moveInput < 0 && facing != 2)
             face(2);
-        else if (xMovement > 0 && facing != 0)
+        else if (moveInput > 0 && facing != 0)
             face(0);
-        else if (xMovement == 0 && facing != 1)
-            face(1);
+
+        //Jumping and Falling
 
         gravity = fallCurve.Evaluate((Time.time - gravityStartTime) / fallTime) * dt * maxFallSpeed * -1;
         float y = gravity;
@@ -101,8 +120,13 @@ public class PlayerMovement : MonoBehaviour {
             }
         }
 
+        //Applying movement
+
         charController.Move(new Vector3(x, y));
-        lastMovement = xMovement;
+
+        lastMovementSpeed = xAcceleration;
+        lastMoveInput = moveInput;
+
         if (charController.isGrounded)
         {
             offGroundCounter = 0;
@@ -116,9 +140,24 @@ public class PlayerMovement : MonoBehaviour {
             float rSpeed = Mathf.Abs(rotationStart - angle) / 90;
             float rT = (Time.time - rotationStartTime) / (rSpeed * rotationTime);
             float yRotation = Mathf.SmoothStep(rotationStart, angle, rT);
-            Debug.Log(yRotation);
             mesh.transform.localRotation = Quaternion.Euler(0, yRotation, 0);
         }
+
+        //Character hovering
+        doHover();
+    }
+
+    void doHover()
+    {
+        hoverTime = (hoverTime + Time.deltaTime) % 2f;
+        float xHover = 0;
+        float dAngle = Mathf.Abs(90 - mesh.transform.eulerAngles.y);
+        if (dAngle < 10)
+        {
+            xHover = xHoverCurve.Evaluate(hoverTime) * xHoverSpace * (1 - (dAngle / 10));
+        }
+        mesh.transform.localPosition = new Vector3(  xHover, yHoverCurve.Evaluate(hoverTime) * yHoverSpace, 0);
+       
     }
 
     void startJump()
