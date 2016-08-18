@@ -3,6 +3,12 @@ using System.Collections;
 
 public class PlayerMovement : MonoBehaviour {
 
+	public enum Masks{
+		NormalMask,
+		StrongMask,
+		AirMask
+	}
+
     public float moveSpeed = 100;
     public float jumpHeight = 0.5f;
     public float jumpTime = 0.5f;
@@ -22,7 +28,8 @@ public class PlayerMovement : MonoBehaviour {
     public float hoverSpeed = 0.5f;
     public AnimationCurve xHoverCurve;
     public AnimationCurve yHoverCurve;
-    public Vector3 air_force_1 = new Vector3 ();
+	public Vector3 air_force_1 = new Vector3 ();
+	public Masks current_mask = Masks.NormalMask;
 
 	[HideInInspector]
 	public float gravityStartTime;
@@ -41,6 +48,8 @@ public class PlayerMovement : MonoBehaviour {
     float rotationStartTime;
     float hoverTime = 0;
     Vector3 startPosition;
+
+	bool pushing = false;
 
     CharacterController charController;
     public GameObject mesh;
@@ -80,9 +89,7 @@ public class PlayerMovement : MonoBehaviour {
 
             // Curve value of                time difference         in relation to      reduced stopping time          times speed to slow down from
             float decPoint = Mathf.Clamp01((Time.time - lastMoveStop) / decelerationTime);
-            Debug.Log("DecPoint: " + decPoint);
             xAcceleration = decelerationCurve.Evaluate(decPoint) * decSpeed;
-            Debug.Log("Break: " + xAcceleration);
             if ((Time.time - lastMoveStop) > rotationDelay && facing != 1)
             {
                 face(1);
@@ -124,13 +131,18 @@ public class PlayerMovement : MonoBehaviour {
                 y = 0;
             }
         }
-
+        
         //Z - lock
         float z = 0;
         if (transform.position.z != startPosition.z)
         {
             z = startPosition.z - transform.position.z;
         }
+
+		if (pushing || !charController.isGrounded) {
+			x *= 0.5f;
+			pushing = false;
+		}
 
         //Applying movement
         air_force_1.z = 0;
@@ -187,9 +199,25 @@ public class PlayerMovement : MonoBehaviour {
         rotationStartTime = Time.time;
         rotationStart = mesh.transform.localRotation.eulerAngles.y;
     }
-
+    
     public void kill()
     {
         
     }
+
+	void OnControllerColliderHit(ControllerColliderHit hit) {
+		if (current_mask != Masks.StrongMask)
+			return;
+		
+		Rigidbody body = hit.collider.attachedRigidbody;
+		if (body == null || body.isKinematic)
+			return;
+
+		if (hit.moveDirection.y < -0.3F)
+			return;
+
+		Vector3 pushDir = new Vector3(hit.moveDirection.x, 0, hit.moveDirection.z);
+		body.velocity = pushDir * charController.velocity.x;
+		pushing = true;
+	}
 }
