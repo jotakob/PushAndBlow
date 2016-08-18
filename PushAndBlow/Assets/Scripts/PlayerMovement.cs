@@ -57,6 +57,7 @@ public class PlayerMovement : MonoBehaviour {
     CharacterController charController;
     GameObject mesh;
     GameObject mask;
+	GameObject[] channels = new GameObject[0];
 
 	Checkpoint last_checkpoint;
 
@@ -66,10 +67,22 @@ public class PlayerMovement : MonoBehaviour {
         charController = GetComponent<CharacterController>();
         startPosition = transform.position;
         availableMasks.Add(Masks.NormalMask);
-        availableMasks.Add(Masks.StrongMask); // TEMP !!
+		availableMasks.Add(Masks.StrongMask); // TEMP !!
+		availableMasks.Add(Masks.AirMask); // TEMP !!
         mesh = transform.FindChild("Mesh").gameObject;
         equipMask(Masks.NormalMask);
 		gravityStartTime = Time.time;
+
+		channels = GameObject.FindGameObjectsWithTag ("AirChannel");
+		if (current_mask != Masks.AirMask) {
+			foreach (var channel in channels) {
+				channel.SetActive (false);
+			}
+		} else {
+			foreach (var channel in channels) {
+				channel.SetActive (true);
+			}
+		}
 	}
 
 
@@ -286,6 +299,16 @@ public class PlayerMovement : MonoBehaviour {
         {
             return false;
         }
+
+		if (newMask == Masks.AirMask) {
+			foreach (var channel in channels) {
+				channel.SetActive (true);
+			}
+		} else {
+			foreach (var channel in channels) {
+				channel.SetActive (false);
+			}
+		}
         
         mesh.transform.FindChild(newMask.ToString()).gameObject.SetActive(true);
         mesh.transform.FindChild(current_mask.ToString()).gameObject.SetActive(false);
