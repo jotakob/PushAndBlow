@@ -3,6 +3,12 @@ using System.Collections;
 
 public class PlayerMovement : MonoBehaviour {
 
+	public enum Masks{
+		NormalMask,
+		StrongMask,
+		AirMask
+	}
+
     public float moveSpeed = 100;
     public float jumpHeight = 0.5f;
     public float jumpTime = 0.5f;
@@ -22,6 +28,7 @@ public class PlayerMovement : MonoBehaviour {
     public AnimationCurve xHoverCurve;
     public AnimationCurve yHoverCurve;
 	public Vector3 air_force_1 = new Vector3 ();
+	public Masks current_mask = Masks.NormalMask;
 
 	[HideInInspector]
 	public float gravityStartTime;
@@ -39,6 +46,8 @@ public class PlayerMovement : MonoBehaviour {
     float rotationStart = 0;
     float rotationStartTime;
     float hoverTime = 0;
+
+	bool pushing = false;
 
     CharacterController charController;
     public GameObject mesh;
@@ -122,6 +131,11 @@ public class PlayerMovement : MonoBehaviour {
             }
         }
 
+		if (pushing) {
+			x *= 0.5f;
+			pushing = false;
+		}
+
         //Applying movement
 		charController.Move(new Vector3(x, y) + (air_force_1 * dt));
 		air_force_1 -= air_force_1 * Mathf.Sqrt(air_force_1.magnitude) * dt;
@@ -175,4 +189,20 @@ public class PlayerMovement : MonoBehaviour {
         rotationStartTime = Time.time;
         rotationStart = mesh.transform.localRotation.eulerAngles.y;
     }
+
+	void OnControllerColliderHit(ControllerColliderHit hit) {
+		if (current_mask != Masks.StrongMask)
+			return;
+		
+		Rigidbody body = hit.collider.attachedRigidbody;
+		if (body == null || body.isKinematic)
+			return;
+
+		if (hit.moveDirection.y < -0.3F)
+			return;
+
+		Vector3 pushDir = new Vector3(hit.moveDirection.x, 0, hit.moveDirection.z);
+		body.velocity = pushDir * charController.velocity.x;
+		pushing = true;
+	}
 }
