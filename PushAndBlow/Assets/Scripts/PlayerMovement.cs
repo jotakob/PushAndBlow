@@ -21,11 +21,13 @@ public class PlayerMovement : MonoBehaviour {
     public float yHoverSpace = 0.1f;
     public AnimationCurve xHoverCurve;
     public AnimationCurve yHoverCurve;
+	public Vector3 air_force_1 = new Vector3 ();
 
-    float deadzone = 0.2f;
+	[HideInInspector]
+	public float gravityStartTime;
+
     int facing = 0;
     float gravity = 0f;
-    float gravityStartTime;
     bool isJumping = false;
     float offGroundCounter = 0;
     float jumpStart;
@@ -121,8 +123,8 @@ public class PlayerMovement : MonoBehaviour {
         }
 
         //Applying movement
-
-        charController.Move(new Vector3(x, y));
+		charController.Move(new Vector3(x, y) + (air_force_1 * dt));
+		air_force_1 -= air_force_1 * Mathf.Sqrt(air_force_1.magnitude) * dt;
 
         lastMovementSpeed = xAcceleration;
         lastMoveInput = moveInput;
