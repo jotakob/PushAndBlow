@@ -3,11 +3,11 @@ using System.Collections;
 
 public class PlayerMovement : MonoBehaviour {
 
-	public enum Masks{
-		NormalMask,
-		StrongMask,
-		AirMask
-	}
+    public enum Masks {
+        NormalMask,
+        StrongMask,
+        AirMask
+    }
 
     public float moveSpeed = 100;
     public float jumpHeight = 0.5f;
@@ -28,11 +28,11 @@ public class PlayerMovement : MonoBehaviour {
     public float hoverSpeed = 0.5f;
     public AnimationCurve xHoverCurve;
     public AnimationCurve yHoverCurve;
-	public Vector3 air_force_1 = new Vector3 ();
-	public Masks current_mask = Masks.NormalMask;
+    public Vector3 air_force_1 = new Vector3();
+    public Masks current_mask = Masks.NormalMask;
 
-	[HideInInspector]
-	public float gravityStartTime;
+    [HideInInspector]
+    public float gravityStartTime;
 
     int facing = 0;
     float gravity = 0f;
@@ -47,18 +47,27 @@ public class PlayerMovement : MonoBehaviour {
     float rotationStart = 0;
     float rotationStartTime;
     float hoverTime = 0;
+    ArrayList availableMasks = new ArrayList();
+    public Mesh[] allMasks;
+    public Material[] allMaskMats;
     Vector3 startPosition;
 
 	bool pushing = false;
 
     CharacterController charController;
-    public GameObject mesh;
+    GameObject mesh;
+    GameObject mask;
 
 
     // Use this for initialization
     void Start () {
         charController = GetComponent<CharacterController>();
         startPosition = transform.position;
+        availableMasks.Add(Masks.NormalMask);
+        availableMasks.Add(Masks.StrongMask); // TEMP !!
+        mesh = transform.FindChild("Mesh").gameObject;
+        mask = mesh.transform.FindChild("Mask").gameObject;
+        equipMask(Masks.NormalMask);
 	}
 	
 	// Update is called once per frame
@@ -111,6 +120,7 @@ public class PlayerMovement : MonoBehaviour {
         {
             if (Input.GetButtonDown("Jump"))
             {
+                Debug.Log("JumpButton");
                 startJump();
             }
             offGroundCounter += dt;
@@ -139,7 +149,7 @@ public class PlayerMovement : MonoBehaviour {
             z = startPosition.z - transform.position.z;
         }
 
-		if (pushing || !charController.isGrounded) {
+		if (pushing) {
 			x *= 0.5f;
 			pushing = false;
 		}
@@ -165,6 +175,50 @@ public class PlayerMovement : MonoBehaviour {
             float rT = (Time.time - rotationStartTime) / (rSpeed * rotationTime);
             float yRotation = Mathf.SmoothStep(rotationStart, angle, rT);
             mesh.transform.localRotation = Quaternion.Euler(0, yRotation, 0);
+        }
+
+        //Masks
+
+        if (Input.GetButtonDown("SwitchMask"))
+        {
+            if (availableMasks.Count > 1)
+            {
+                switch (current_mask)
+                {
+                    case Masks.NormalMask:
+                        if (availableMasks.Contains(Masks.StrongMask))
+                        {
+                            equipMask(Masks.StrongMask);
+                        }
+                        else
+                        {
+                            equipMask(Masks.AirMask);
+                        }
+                        break;
+                    case Masks.StrongMask:
+                        if (availableMasks.Contains(Masks.AirMask))
+                        {
+                            equipMask(Masks.AirMask);
+                        }
+                        else
+                        {
+                            equipMask(Masks.NormalMask);
+                        }
+                        break;
+                    case Masks.AirMask:
+                        if (availableMasks.Contains(Masks.StrongMask))
+                        {
+                            equipMask(Masks.StrongMask);
+                        }
+                        else
+                        {
+                            equipMask(Masks.NormalMask);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
 
         //Character hovering
@@ -202,7 +256,31 @@ public class PlayerMovement : MonoBehaviour {
     
     public void kill()
     {
+        face(1);
+        this.transform.position = startPosition;
+    }
+
+    public void addMask(Masks newMask)
+    {
+        if (!availableMasks.Contains(newMask))
+        {
+            availableMasks.Add(mask);
+        }
+        equipMask(newMask);
+    }
+
+    public bool equipMask(Masks newMask)
+    {
+        if (!availableMasks.Contains(newMask))
+        {
+            return false;
+        }
         
+        mesh.transform.FindChild(newMask.ToString()).gameObject.SetActive(true);
+        mesh.transform.FindChild(current_mask.ToString()).gameObject.SetActive(false);
+        current_mask = newMask;
+
+        return true;
     }
 
 	void OnControllerColliderHit(ControllerColliderHit hit) {
