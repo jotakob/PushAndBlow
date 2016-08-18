@@ -25,6 +25,7 @@ public class PlayerMovement : MonoBehaviour {
     public float rotationTime = 0.2f;
     public float xHoverSpace = 0.1f;
     public float yHoverSpace = 0.1f;
+    public float hoverSpeed = 0.5f;
     public AnimationCurve xHoverCurve;
     public AnimationCurve yHoverCurve;
 	public Vector3 air_force_1 = new Vector3 ();
@@ -46,6 +47,7 @@ public class PlayerMovement : MonoBehaviour {
     float rotationStart = 0;
     float rotationStartTime;
     float hoverTime = 0;
+    Vector3 startPosition;
 
 	bool pushing = false;
 
@@ -56,6 +58,7 @@ public class PlayerMovement : MonoBehaviour {
     // Use this for initialization
     void Start () {
         charController = GetComponent<CharacterController>();
+        startPosition = transform.position;
 	}
 	
 	// Update is called once per frame
@@ -86,9 +89,7 @@ public class PlayerMovement : MonoBehaviour {
 
             // Curve value of                time difference         in relation to      reduced stopping time          times speed to slow down from
             float decPoint = Mathf.Clamp01((Time.time - lastMoveStop) / decelerationTime);
-            Debug.Log("DecPoint: " + decPoint);
             xAcceleration = decelerationCurve.Evaluate(decPoint) * decSpeed;
-            Debug.Log("Break: " + xAcceleration);
             if ((Time.time - lastMoveStop) > rotationDelay && facing != 1)
             {
                 face(1);
@@ -130,16 +131,23 @@ public class PlayerMovement : MonoBehaviour {
                 y = 0;
             }
         }
+        
+        //Z - lock
+        float z = 0;
+        if (transform.position.z != startPosition.z)
+        {
+            z = startPosition.z - transform.position.z;
+        }
 
-		if (pushing) {
+		if (pushing || !charController.isGrounded) {
 			x *= 0.5f;
 			pushing = false;
 		}
 
         //Applying movement
-		charController.Move(new Vector3(x, y) + (air_force_1 * dt));
+        air_force_1.z = 0;
+        charController.Move(new Vector3(x, y, z) + (air_force_1 * dt));
 		air_force_1 -= air_force_1 * Mathf.Sqrt(air_force_1.magnitude) * dt;
-
         lastMovementSpeed = xAcceleration;
         lastMoveInput = moveInput;
 
@@ -161,11 +169,13 @@ public class PlayerMovement : MonoBehaviour {
 
         //Character hovering
         doHover();
+
+        
     }
 
     void doHover()
     {
-        hoverTime = (hoverTime + Time.deltaTime) % 2f;
+        hoverTime = (hoverTime + (Time.deltaTime * hoverSpeed)) % 2f;
         float xHover = 0;
         float dAngle = Mathf.Abs(90 - mesh.transform.eulerAngles.y);
         if (dAngle < 10)
@@ -189,6 +199,11 @@ public class PlayerMovement : MonoBehaviour {
         rotationStartTime = Time.time;
         rotationStart = mesh.transform.localRotation.eulerAngles.y;
     }
+    
+    public void kill()
+    {
+        
+    }
 
 	void OnControllerColliderHit(ControllerColliderHit hit) {
 		if (current_mask != Masks.StrongMask)
@@ -201,8 +216,8 @@ public class PlayerMovement : MonoBehaviour {
 		if (hit.moveDirection.y < -0.3F)
 			return;
 
-		Vector3 pushDir = new Vector3(hit.moveDirection.x, 0, hit.moveDirection.z);
-		body.velocity = pushDir * charController.velocity.x;
+		Vector3 pushDir = new Vector3(hit.moveDirection.x, hit.moveDirection.y ,0);
+		body.velocity = pushDir * Mathf.Abs(charController.velocity.x)*1.1f;
 		pushing = true;
 	}
 }
