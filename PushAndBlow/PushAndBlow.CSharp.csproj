@@ -66,6 +66,7 @@
     <Compile Include="Assets\Scripts\AirChannel.cs" />
     <Compile Include="Assets\Scripts\AirChannelControl.cs" />
     <Compile Include="Assets\Scripts\DoorControl.cs" />
+    <Compile Include="Assets\Scripts\MovingPlatform.cs" />
     <Compile Include="Assets\Scripts\PlayerMovement.cs" />
     <Compile Include="Assets\Scripts\Switch.cs" />
     <Compile Include="Assets\Scripts\TriggerButton.cs" />
