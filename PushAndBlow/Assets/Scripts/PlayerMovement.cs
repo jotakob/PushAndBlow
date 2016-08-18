@@ -158,15 +158,12 @@ public class PlayerMovement : MonoBehaviour {
         {
             z = startPosition.z - transform.position.z;
         }
-
-		if (pushing) {
-			x *= 0.5f;
-			pushing = false;
-		}
+			
 
         //Applying movement
         air_force_1.z = 0;
-        charController.Move(new Vector3(x, y, z) + (air_force_1 * dt));
+		var result = charController.Move(new Vector3(x, y, z) + (air_force_1 * dt));
+		pushing = result == CollisionFlags.Sides;
 		air_force_1 -= air_force_1 * Mathf.Sqrt(air_force_1.magnitude) * dt;
         lastMovementSpeed = xAcceleration;
         lastMoveInput = moveInput;
@@ -298,9 +295,6 @@ public class PlayerMovement : MonoBehaviour {
     }
 
 	void OnControllerColliderHit(ControllerColliderHit hit) {
-		if (current_mask != Masks.StrongMask)
-			return;
-		
 		Rigidbody body = hit.collider.attachedRigidbody;
 		if (body == null || body.isKinematic)
 			return;
@@ -308,8 +302,13 @@ public class PlayerMovement : MonoBehaviour {
 		if (hit.moveDirection.y < -0.3F)
 			return;
 
-		Vector3 pushDir = new Vector3(hit.moveDirection.x, hit.moveDirection.y ,0);
-		body.velocity = pushDir * Mathf.Abs(charController.velocity.x)*1.1f;
-		pushing = true;
+		if (current_mask != Masks.StrongMask) {
+			Vector3 pushBackDir = new Vector3 (-hit.moveDirection.x, -hit.moveDirection.y, 0)*body.velocity.magnitude;
+			charController.Move (pushBackDir);
+			return;
+		}
+		
+		Vector3 pushDir = new Vector3 (hit.moveDirection.x, hit.moveDirection.y, 0);
+		body.velocity = pushDir * moveSpeed*0.1f;
 	}
 }
