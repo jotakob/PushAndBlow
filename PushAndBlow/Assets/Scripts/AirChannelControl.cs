@@ -60,6 +60,12 @@ public class AirChannelControl : MonoBehaviour {
 			var sh = my_particles.shape;
 			sh.box = new Vector3 (size, size, 0.2f);
 		}
+
+		moveing.Clear ();
+	}
+
+	void Enable(){
+		moveing.Clear ();
 	}
 
 	void add_object(Collider col){
