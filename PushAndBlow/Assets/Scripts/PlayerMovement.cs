@@ -57,6 +57,7 @@ public class PlayerMovement : MonoBehaviour {
     CharacterController charController;
     GameObject mesh;
     GameObject mask;
+	GameObject[] channels = new GameObject[0];
 
 	Checkpoint last_checkpoint;
 
@@ -66,10 +67,22 @@ public class PlayerMovement : MonoBehaviour {
         charController = GetComponent<CharacterController>();
         startPosition = transform.position;
         availableMasks.Add(Masks.NormalMask);
-        availableMasks.Add(Masks.StrongMask); // TEMP !!
+		availableMasks.Add(Masks.StrongMask); // TEMP !!
+		availableMasks.Add(Masks.AirMask); // TEMP !!
         mesh = transform.FindChild("Mesh").gameObject;
         equipMask(Masks.NormalMask);
 		gravityStartTime = Time.time;
+
+		channels = GameObject.FindGameObjectsWithTag ("AirChannel");
+		if (current_mask != Masks.AirMask) {
+			foreach (var channel in channels) {
+				channel.SetActive (false);
+			}
+		} else {
+			foreach (var channel in channels) {
+				channel.SetActive (true);
+			}
+		}
 	}
 
 
@@ -158,15 +171,12 @@ public class PlayerMovement : MonoBehaviour {
         {
             z = startPosition.z - transform.position.z;
         }
-
-		if (pushing) {
-			x *= 0.5f;
-			pushing = false;
-		}
+			
 
         //Applying movement
         air_force_1.z = 0;
-        charController.Move(new Vector3(x, y, z) + (air_force_1 * dt));
+		var result = charController.Move(new Vector3(x, y, z) + (air_force_1 * dt));
+		pushing = result == CollisionFlags.Sides;
 		air_force_1 -= air_force_1 * Mathf.Sqrt(air_force_1.magnitude) * dt;
         lastMovementSpeed = xAcceleration;
         lastMoveInput = moveInput;
@@ -289,6 +299,16 @@ public class PlayerMovement : MonoBehaviour {
         {
             return false;
         }
+
+		if (newMask == Masks.AirMask) {
+			foreach (var channel in channels) {
+				channel.SetActive (true);
+			}
+		} else {
+			foreach (var channel in channels) {
+				channel.SetActive (false);
+			}
+		}
         
         mesh.transform.FindChild(newMask.ToString()).gameObject.SetActive(true);
         mesh.transform.FindChild(current_mask.ToString()).gameObject.SetActive(false);
@@ -298,9 +318,6 @@ public class PlayerMovement : MonoBehaviour {
     }
 
 	void OnControllerColliderHit(ControllerColliderHit hit) {
-		if (current_mask != Masks.StrongMask)
-			return;
-		
 		Rigidbody body = hit.collider.attachedRigidbody;
 		if (body == null || body.isKinematic)
 			return;
@@ -308,8 +325,13 @@ public class PlayerMovement : MonoBehaviour {
 		if (hit.moveDirection.y < -0.3F)
 			return;
 
-		Vector3 pushDir = new Vector3(hit.moveDirection.x, hit.moveDirection.y ,0);
-		body.velocity = pushDir * Mathf.Abs(charController.velocity.x)*1.1f;
-		pushing = true;
+		if (current_mask != Masks.StrongMask) {
+			Vector3 pushBackDir = new Vector3 (-hit.moveDirection.x, -hit.moveDirection.y, 0)*body.velocity.magnitude;
+			charController.Move (pushBackDir);
+			return;
+		}
+		
+		Vector3 pushDir = new Vector3 (hit.moveDirection.x, hit.moveDirection.y, 0);
+		body.velocity = pushDir * moveSpeed*0.1f;
 	}
 }
