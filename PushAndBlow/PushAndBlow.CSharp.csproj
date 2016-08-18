@@ -63,12 +63,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\LoadLevel.cs" />
     <Compile Include="Assets\Scripts\AirChannel.cs" />
     <Compile Include="Assets\Scripts\AirChannelControl.cs" />
     <Compile Include="Assets\Scripts\DoorControl.cs" />
+    <Compile Include="Assets\Scripts\LoadOperations.cs" />
     <Compile Include="Assets\Scripts\MovingPlatform.cs" />
     <Compile Include="Assets\Scripts\PlayerMovement.cs" />
     <Compile Include="Assets\Scripts\Switch.cs" />
+    <Compile Include="Assets\Scripts\SwitchCharTrigger.cs" />
     <Compile Include="Assets\Scripts\TriggerButton.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
