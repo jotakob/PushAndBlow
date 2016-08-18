@@ -18,6 +18,6 @@ public class Checkpoint : MonoBehaviour {
 	}
 
 	void OnTriggerEnter(Collider other){
-		other.SendMessage ("checkpoint", this);
+		other.SendMessage ("checkpoint", this, SendMessageOptions.DontRequireReceiver);
 	}
 }
