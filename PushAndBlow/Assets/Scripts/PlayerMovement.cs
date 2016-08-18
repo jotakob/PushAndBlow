@@ -16,11 +16,14 @@ public class PlayerMovement : MonoBehaviour {
     public AnimationCurve accelerationCurve;
     public AnimationCurve decelerationCurve;
     public float rotationTime = 0.2f;
+	public Vector3 air_force_1 = new Vector3 ();
+	[HideInInspector]
+	public float gravityStartTime;
+
     
     float deadzone = 0.2f;
     int facing = 0;
     float gravity = 0f;
-    float gravityStartTime;
     bool isJumping = false;
     float offGroundCounter = 0;
     float jumpStart;
@@ -101,7 +104,8 @@ public class PlayerMovement : MonoBehaviour {
             }
         }
 
-        charController.Move(new Vector3(x, y));
+		charController.Move(new Vector3(x, y)+air_force_1*dt);
+		air_force_1 -= air_force_1*Mathf.Sqrt(air_force_1.magnitude) * dt;
         lastMovement = xMovement;
         if (charController.isGrounded)
         {

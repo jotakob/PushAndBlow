@@ -16,7 +16,7 @@ public class AirChannelControl : MonoBehaviour {
 	private Vector3 start ;
 	private Vector3 end;
 
-	private List<Rigidbody> moveing = new List<Rigidbody> ();
+	private List<Collider> moveing = new List<Collider> ();
 
 	public float size = 1;
 	public float strength = 1;
@@ -63,18 +63,25 @@ public class AirChannelControl : MonoBehaviour {
 	}
 
 	void add_object(Collider col){
-		moveing.Add (col.attachedRigidbody);
+		moveing.Add (col);
 
 		var start = start_object.transform.position;
 		var end = end_object.transform.position;
 
 		var velo = end - start;
 		velo.Normalize ();
-		col.attachedRigidbody.AddForce (velo * strength, ForceMode.Impulse);
+		var char_con = col.GetComponent<PlayerMovement> ();
+		if (char_con) {
+			
+			char_con.air_force_1 = velo * strength ;
+			char_con.gravityStartTime = Time.time;
+		} else {
+			col.attachedRigidbody.AddForce (velo * strength, ForceMode.Impulse);
+		}
 	}
 
 	void remove_object(Collider col){
-		moveing.Remove (col.attachedRigidbody);
+		moveing.Remove (col);
 	}
 	
 	// Update is called once per frame
@@ -86,7 +93,13 @@ public class AirChannelControl : MonoBehaviour {
 		velo.Normalize ();
 		foreach (var body in moveing) {
 			var pro_velo = Vector3.Project (body.transform.position - start, velo)-(body.transform.position - start);
-			body.velocity = velo * strength + pro_velo;
+			var char_con = body.GetComponent<PlayerMovement> ();
+			if (char_con) {
+				char_con.gravityStartTime = Time.time;
+				char_con.air_force_1 = (velo * strength + pro_velo);
+			} else {
+				body.attachedRigidbody.velocity = velo * strength + pro_velo;
+			}
 		}
 	}
 
