@@ -201,8 +201,8 @@ public class PlayerMovement : MonoBehaviour {
 		if (hit.moveDirection.y < -0.3F)
 			return;
 
-		Vector3 pushDir = new Vector3(hit.moveDirection.x, 0, hit.moveDirection.z);
-		body.velocity = pushDir * charController.velocity.x;
+		Vector3 pushDir = new Vector3(hit.moveDirection.x, hit.moveDirection.y ,0);
+		body.velocity = pushDir * Mathf.Abs(charController.velocity.x)*1.1f;
 		pushing = true;
 	}
 }
