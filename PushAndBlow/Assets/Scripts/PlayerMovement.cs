@@ -130,6 +130,7 @@ public class PlayerMovement : MonoBehaviour {
                 y = 0;
             }
         }
+
 		if (pushing) {
 			x *= 0.5f;
 			pushing = false;
