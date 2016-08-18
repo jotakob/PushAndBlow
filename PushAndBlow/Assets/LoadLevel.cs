@@ -3,6 +3,9 @@ using System.Collections;
 
 public class LoadLevel : MonoBehaviour {
 
+	public LoadOperations load_fader;
+	public int next_level = 1;
+
 	// Use this for initialization
 	void Start () {
 	
@@ -17,7 +20,8 @@ public class LoadLevel : MonoBehaviour {
     {
         if (other.CompareTag("Player"))
         {
-            Application.LoadLevel("Level_01");
+			load_fader.LevelToLoad = next_level;
+			load_fader.FadeOut();
         }
     }
 }
