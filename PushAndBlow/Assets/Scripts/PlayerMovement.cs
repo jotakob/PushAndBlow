@@ -4,21 +4,23 @@ using System.Collections;
 public class PlayerMovement : MonoBehaviour {
 
     public float moveSpeed = 100;
-    public float g = 5f;
     public float jumpHeight = 0.5f;
     public float jumpTime = 0.5f;
     public float airJumpThreshold = 0.1f;
     public AnimationCurve jumpCurve;
+    public float fallTime = 1f;
+    public float maxFallSpeed = 15f;
+    public AnimationCurve fallCurve;
     public float accelerationTime = 0.5f;
     public float decelerationTime = 0.2f;
-    public float breakForce = 3.5f;
-    public CharacterController charController;
     public AnimationCurve accelerationCurve;
     public AnimationCurve decelerationCurve;
+    public float rotationTime = 0.2f;
     
     float deadzone = 0.2f;
     int facing = 0;
     float gravity = 0f;
+    float gravityStartTime;
     bool isJumping = false;
     float offGroundCounter = 0;
     float jumpStart;
@@ -26,9 +28,15 @@ public class PlayerMovement : MonoBehaviour {
     float lastMoveStart;
     float lastMoveStop;
     float decDirection;
+    float rotationStart = 0;
+    float rotationStartTime;
 
-	// Use this for initialization
-	void Start () {
+    CharacterController charController;
+    public GameObject mesh;
+
+
+    // Use this for initialization
+    void Start () {
         charController = GetComponent<CharacterController>();
 	}
 	
@@ -40,7 +48,7 @@ public class PlayerMovement : MonoBehaviour {
         float xMovement = Input.GetAxis("Horizontal");
         if (xMovement != 0)
         {
-            if (lastMovement == 0 || Mathf.Sign(lastMovement) != xMovement)
+            if (lastMovement == 0 || Mathf.Sign(lastMovement) != Mathf.Sign(xMovement))
             {
                 lastMoveStart = Time.time;
             }
@@ -59,14 +67,14 @@ public class PlayerMovement : MonoBehaviour {
         }
 
 
-        if (xMovement > 0 && facing != 2)
+        if (xMovement < 0 && facing != 2)
             face(2);
-        else if (xMovement < 0 && facing != 1)
-            face(1);
-        else if (xMovement == 0 && facing != 0)
+        else if (xMovement > 0 && facing != 0)
             face(0);
+        else if (xMovement == 0 && facing != 1)
+            face(1);
 
-        gravity -= g * dt;
+        gravity = fallCurve.Evaluate((Time.time - gravityStartTime) / fallTime) * dt * maxFallSpeed * -1;
         float y = gravity;
         if (offGroundCounter < airJumpThreshold)
         {
@@ -80,14 +88,15 @@ public class PlayerMovement : MonoBehaviour {
         if (isJumping)
         {
             float jumpPoint = (Time.time - jumpStart) / jumpTime;
+            float lastJumpPoint = (Time.time - jumpStart - dt) / jumpTime;
             if (jumpPoint <= 1)
             {
-                y = jumpCurve.Evaluate(jumpPoint) * jumpHeight * dt;
+                y = jumpCurve.Evaluate(jumpPoint - lastJumpPoint) * jumpHeight;
             }
             else
             {
                 isJumping = false;
-                gravity = 0;
+                gravityStartTime = Time.time;
                 y = 0;
             }
         }
@@ -97,9 +106,19 @@ public class PlayerMovement : MonoBehaviour {
         if (charController.isGrounded)
         {
             offGroundCounter = 0;
-            gravity = 0;
+            gravityStartTime = Time.time;
         }
 
+        //Character smooth rotation
+        int angle = facing * 90;
+        if (mesh.transform.localRotation.eulerAngles.y != angle)
+        {
+            float rSpeed = Mathf.Abs(rotationStart - angle) / 90;
+            float rT = (Time.time - rotationStartTime) / (rSpeed * rotationTime);
+            float yRotation = Mathf.SmoothStep(rotationStart, angle, rT);
+            Debug.Log(yRotation);
+            mesh.transform.localRotation = Quaternion.Euler(0, yRotation, 0);
+        }
     }
 
     void startJump()
@@ -108,9 +127,11 @@ public class PlayerMovement : MonoBehaviour {
         isJumping = true;
     }
 
-    //Flips the character, 0 = Front, 1 = Left, 2 = Right
+    //Flips the character, 0 = Right, 1 = Front, 2 = Left
     void face(int direction)
     {
-        
+        facing = direction;
+        rotationStartTime = Time.time;
+        rotationStart = mesh.transform.localRotation.eulerAngles.y;
     }
 }
