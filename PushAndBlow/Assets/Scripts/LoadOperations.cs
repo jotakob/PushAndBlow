@@ -53,7 +53,7 @@ public class LoadOperations: MonoBehaviour {
 		//Fade Out the screen to black
 		if(fadeout){
 			myImage.color = Color.Lerp(myImage.color, Color.black, fadeSpeed * Time.deltaTime);
-
+			gameObject.BroadcastMessage ("frezze", SendMessageOptions.DontRequireReceiver);
 			//Once the Black image is visible enough, Start loading the next level
 			if(myImage.color.a >= 0.999){
 				StartCoroutine("LoadALevel");
@@ -62,10 +62,12 @@ public class LoadOperations: MonoBehaviour {
 		}
 
 		if(fadein){
+			gameObject.BroadcastMessage ("frezze", SendMessageOptions.DontRequireReceiver);
 			myImage.color = Color.Lerp(myImage.color, new Color(0,0,0,0), fadeSpeed * Time.deltaTime);
 
 			if(myImage.color.a <= 0.01){
 				fadein = false;
+				gameObject.BroadcastMessage ("unfrezze", SendMessageOptions.DontRequireReceiver);
 			}
 		}
 	}

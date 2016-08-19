@@ -47,6 +47,7 @@ public class PlayerMovement : MonoBehaviour {
     float rotationStart = 0;
     float rotationStartTime;
     float hoverTime = 0;
+	bool frezze_player = false;
     
     Vector3 startPosition;
 
@@ -91,6 +92,9 @@ public class PlayerMovement : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if (frezze_player)
+			return;
+
 
         float dt = Time.deltaTime;
         
@@ -321,6 +325,13 @@ public class PlayerMovement : MonoBehaviour {
 
         return true;
     }
+
+	void frezze(){
+		frezze_player = true;
+	}
+	void unfrezze(){
+		frezze_player = false;
+	}
 
 	void OnControllerColliderHit(ControllerColliderHit hit) {
 		Rigidbody body = hit.collider.attachedRigidbody;
