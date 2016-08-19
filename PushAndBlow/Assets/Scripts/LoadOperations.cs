@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class LoadOperations: MonoBehaviour {
 
+    public AudioManager audio;
 	public Image myImage;
 	// Use this for initialization
 	public bool UseAsync;
@@ -26,6 +27,7 @@ public class LoadOperations: MonoBehaviour {
 	public void FadeOut(){
 		fadein= false;
 		fadeout = true;
+        audio.globalFadeOut(fadeSpeed);
 	}
 
 	public void FadeIn(){
@@ -33,7 +35,8 @@ public class LoadOperations: MonoBehaviour {
 
 		fadeout = false;
 		fadein = true;
-	}
+        audio.globalFadeIn(fadeSpeed);
+    }
 
 	void Update(){
 		if (change_level) {
