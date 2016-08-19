@@ -47,16 +47,13 @@ public class PlayerMovement : MonoBehaviour {
     float rotationStart = 0;
     float rotationStartTime;
     float hoverTime = 0;
-    ArrayList availableMasks = new ArrayList();
-    public Mesh[] allMasks;
-    public Material[] allMaskMats;
+    public ArrayList availableMasks = new ArrayList();
     Vector3 startPosition;
 
 	bool pushing = false;
 
     CharacterController charController;
     GameObject mesh;
-    GameObject mask;
 	GameObject[] channels = new GameObject[0];
 
 	Checkpoint last_checkpoint;
@@ -67,11 +64,10 @@ public class PlayerMovement : MonoBehaviour {
         charController = GetComponent<CharacterController>();
         startPosition = transform.position;
         availableMasks.Add(Masks.NormalMask);
-		availableMasks.Add(Masks.StrongMask); // TEMP !!
-		availableMasks.Add(Masks.AirMask); // TEMP !!
         mesh = transform.FindChild("Mesh").gameObject;
         equipMask(Masks.NormalMask);
 		gravityStartTime = Time.time;
+        rotationStartTime = Time.time;
 
 		channels = GameObject.FindGameObjectsWithTag ("AirChannel");
 		if (current_mask != Masks.AirMask) {
@@ -97,6 +93,14 @@ public class PlayerMovement : MonoBehaviour {
 	void Update () {
 
         float dt = Time.deltaTime;
+        
+        // CHEATCODES!!
+
+        if (Input.GetKeyDown("n"))
+        {
+            availableMasks.Add(Masks.StrongMask); // TEMP !!
+            availableMasks.Add(Masks.AirMask); // TEMP !!
+        }
 
         //Horizontal movement
 
@@ -143,7 +147,6 @@ public class PlayerMovement : MonoBehaviour {
         {
             if (Input.GetButtonDown("Jump"))
             {
-                Debug.Log("JumpButton");
                 startJump();
             }
             offGroundCounter += dt;
@@ -191,7 +194,7 @@ public class PlayerMovement : MonoBehaviour {
         int angle = facing * 90;
         if (mesh.transform.localRotation.eulerAngles.y != angle)
         {
-            float rSpeed = Mathf.Abs(rotationStart - angle) / 90;
+            float rSpeed = Mathf.Clamp(Mathf.Abs(rotationStart - angle) / 90, 0.0001f, 2);
             float rT = (Time.time - rotationStartTime) / (rSpeed * rotationTime);
             float yRotation = Mathf.SmoothStep(rotationStart, angle, rT);
             mesh.transform.localRotation = Quaternion.Euler(0, yRotation, 0);
@@ -288,7 +291,7 @@ public class PlayerMovement : MonoBehaviour {
     {
         if (!availableMasks.Contains(newMask))
         {
-            availableMasks.Add(mask);
+            availableMasks.Add(newMask);
         }
         equipMask(newMask);
     }
@@ -309,7 +312,6 @@ public class PlayerMovement : MonoBehaviour {
 				channel.SetActive (false);
 			}
 		}
-        
         mesh.transform.FindChild(newMask.ToString()).gameObject.SetActive(true);
         mesh.transform.FindChild(current_mask.ToString()).gameObject.SetActive(false);
         current_mask = newMask;

@@ -11,6 +11,7 @@ public class DoorControl : MonoBehaviour {
 
 	void switch_on(){
 		door_animator.SetBool ("close", false);
+        GetComponent<AudioSource>().Play();
 	}
 
 	void switch_off(){

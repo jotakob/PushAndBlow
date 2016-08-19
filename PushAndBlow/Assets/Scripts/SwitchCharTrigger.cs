@@ -7,7 +7,7 @@ public class SwitchCharTrigger : MonoBehaviour {
 
 	void OnTriggerStay(Collider other){
 		if (other.CompareTag ("Player")) {
-			if (Input.GetButtonDown ("Fire2")) {
+			if (Input.GetButtonDown ("Interact")) {
 				switch_anim.SetBool ("on", !switch_anim.GetBool ("on"));
 			}
 		}
