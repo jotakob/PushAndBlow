@@ -64,7 +64,7 @@ public class AirChannelControl : MonoBehaviour {
 		moveing.Clear ();
 	}
 
-	void Enable(){
+	void OnEnable(){
 		moveing.Clear ();
 	}
 
