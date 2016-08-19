@@ -1,15 +1,17 @@
-﻿<Properties StartupItem="Assembly-CSharp.csproj">
+﻿<Properties StartupItem="PushAndBlow.CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\AirChannelControl.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/PlayerMovement.cs">
     <Files>
-      <File FileName="Assets\Scripts\PlayerMovement.cs" Line="71" Column="39" />
-      <File FileName="Assets\Scripts\MovingPlatform.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\AirChannelControl.cs" Line="68" Column="20" />
-      <File FileName="Assets\Scripts\LoadOperations.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\Checkpoint.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\Kill.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\EanbleEntity.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\AirChannel.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/AirChannelControl.cs" Line="67" Column="15" />
+      <File FileName="Assets/Scripts/MovingPlatform.cs" Line="38" Column="3" />
+      <File FileName="Assets/Scripts/MaskState.cs" Line="9" Column="10" />
+<<<<<<< Updated upstream
+      <File FileName="Assets/Scripts/PlayerMovement.cs" Line="333" Column="11" />
+=======
+      <File FileName="Assets/Scripts/PlayerMovement.cs" Line="343" Column="4" />
+>>>>>>> Stashed changes
+      <File FileName="Assets/Scripts/LoadOperations.cs" Line="87" Column="69" />
+      <File FileName="Assets/Scripts/Boulder.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

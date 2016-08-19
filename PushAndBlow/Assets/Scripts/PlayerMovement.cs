@@ -247,6 +247,9 @@ public class PlayerMovement : MonoBehaviour {
         //Character hovering
         doHover();
 
+		if (Input.GetButtonDown ("Cancel")) {
+			Application.Quit ();
+		}
         
     }
 
@@ -332,8 +335,16 @@ public class PlayerMovement : MonoBehaviour {
 			charController.Move (pushBackDir);
 			return;
 		}
-		
 		Vector3 pushDir = new Vector3 (hit.moveDirection.x, hit.moveDirection.y, 0);
-		body.velocity = pushDir * moveSpeed*0.1f;
+		var velo = pushDir * moveSpeed*0.2f;
+
+		var boulder = hit.gameObject.GetComponent<Boulder> ();
+		if (boulder) {
+			if (!boulder.isGrounded) {
+				body.AddForce (velo, ForceMode.Impulse);
+				return;
+			}				
+		}
+		body.velocity = velo;
 	}
 }
