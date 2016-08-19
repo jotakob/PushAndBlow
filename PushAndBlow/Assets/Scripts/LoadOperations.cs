@@ -75,10 +75,14 @@ public class LoadOperations: MonoBehaviour {
 			
 			myImage.color = Color.Lerp(myImage.color, new Color(0,0,0,0), fadeSpeed * Time.deltaTime);
 
-			if(myImage.color.a <= 0.01){
+            if (myImage.color.a <= 0.25)
+            {
+                foreach (var player in players)
+                    player.SendMessage("unfrezze", SendMessageOptions.DontRequireReceiver);
+            }
+
+            if (myImage.color.a <= 0.01){
 				fadein = false;
-				foreach(var player in players)
-					player.SendMessage ("unfrezze", SendMessageOptions.DontRequireReceiver);
 			}
 		}
 	}

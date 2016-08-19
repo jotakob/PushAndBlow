@@ -347,7 +347,7 @@ public class PlayerMovement : MonoBehaviour {
 			return;
 		}
 		Vector3 pushDir = new Vector3 (hit.moveDirection.x, hit.moveDirection.y, 0);
-		var velo = pushDir * moveSpeed*0.2f;
+		var velo = pushDir * moveSpeed * 0.3f;
 
 		var boulder = hit.gameObject.GetComponent<Boulder> ();
 		if (boulder) {
