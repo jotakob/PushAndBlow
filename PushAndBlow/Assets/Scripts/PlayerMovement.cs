@@ -47,7 +47,7 @@ public class PlayerMovement : MonoBehaviour {
     float rotationStart = 0;
     float rotationStartTime;
     float hoverTime = 0;
-    public ArrayList availableMasks = new ArrayList();
+    
     Vector3 startPosition;
 
 	bool pushing = false;
@@ -63,7 +63,7 @@ public class PlayerMovement : MonoBehaviour {
     void Start () {
         charController = GetComponent<CharacterController>();
         startPosition = transform.position;
-        availableMasks.Add(Masks.NormalMask);
+		MaskState.getMaskState().availableMasks.Add(Masks.NormalMask);
         mesh = transform.FindChild("Mesh").gameObject;
         equipMask(Masks.NormalMask);
 		gravityStartTime = Time.time;
@@ -98,8 +98,8 @@ public class PlayerMovement : MonoBehaviour {
 
         if (Input.GetKeyDown("n"))
         {
-            availableMasks.Add(Masks.StrongMask); // TEMP !!
-            availableMasks.Add(Masks.AirMask); // TEMP !!
+			MaskState.getMaskState().availableMasks.Add(Masks.StrongMask); // TEMP !!
+			MaskState.getMaskState().availableMasks.Add(Masks.AirMask); // TEMP !!
         }
 
         //Horizontal movement
@@ -204,12 +204,12 @@ public class PlayerMovement : MonoBehaviour {
 
         if (Input.GetButtonDown("SwitchMask"))
         {
-            if (availableMasks.Count > 1)
+			if (MaskState.getMaskState().availableMasks.Count > 1)
             {
                 switch (current_mask)
                 {
                     case Masks.NormalMask:
-                        if (availableMasks.Contains(Masks.StrongMask))
+					if (MaskState.getMaskState().availableMasks.Contains(Masks.StrongMask))
                         {
                             equipMask(Masks.StrongMask);
                         }
@@ -219,7 +219,7 @@ public class PlayerMovement : MonoBehaviour {
                         }
                         break;
                     case Masks.StrongMask:
-                        if (availableMasks.Contains(Masks.AirMask))
+					if (MaskState.getMaskState().availableMasks.Contains(Masks.AirMask))
                         {
                             equipMask(Masks.AirMask);
                         }
@@ -229,7 +229,7 @@ public class PlayerMovement : MonoBehaviour {
                         }
                         break;
                     case Masks.AirMask:
-                        if (availableMasks.Contains(Masks.StrongMask))
+					if (MaskState.getMaskState().availableMasks.Contains(Masks.StrongMask))
                         {
                             equipMask(Masks.StrongMask);
                         }
@@ -289,16 +289,16 @@ public class PlayerMovement : MonoBehaviour {
 
     public void addMask(Masks newMask)
     {
-        if (!availableMasks.Contains(newMask))
+		if (!MaskState.getMaskState().availableMasks.Contains(newMask))
         {
-            availableMasks.Add(newMask);
+			MaskState.getMaskState().availableMasks.Add(newMask);
         }
         equipMask(newMask);
     }
 
     public bool equipMask(Masks newMask)
     {
-        if (!availableMasks.Contains(newMask))
+		if (!MaskState.getMaskState().availableMasks.Contains(newMask))
         {
             return false;
         }

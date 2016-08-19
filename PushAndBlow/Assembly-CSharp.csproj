@@ -55,6 +55,7 @@
      <Compile Include="Assets\Scripts\EanbleEntity.cs" />
      <Compile Include="Assets\Scripts\Kill.cs" />
      <Compile Include="Assets\Scripts\LoadOperations.cs" />
+     <Compile Include="Assets\Scripts\MaskState.cs" />
      <Compile Include="Assets\Scripts\MovingPlatform.cs" />
      <Compile Include="Assets\Scripts\PlaySound.cs" />
      <Compile Include="Assets\Scripts\PlayerMovement.cs" />

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class LoadOperations: MonoBehaviour {
 
@@ -73,12 +74,21 @@ public class LoadOperations: MonoBehaviour {
 		if(UseAsync){
 			LevelToLoad= index;
 		}else{
-			Application.LoadLevel(index);
+			if (SceneManager.sceneCount <= index) {
+				SceneManager.LoadScene (index, LoadSceneMode.Single);
+			} else {
+				SceneManager.SetActiveScene (SceneManager.GetSceneAt (index));
+			}
 		}
 	}
 
 	public IEnumerator LoadALevel() {
-		async = Application.LoadLevelAsync(LevelToLoad);
+		if (SceneManager.sceneCount > LevelToLoad) {
+			SceneManager.SetActiveScene (SceneManager.GetSceneAt (LevelToLoad));
+			yield return true;
+		}
+		
+		async = SceneManager.LoadSceneAsync(LevelToLoad,LoadSceneMode.Single);
 		yield return async;
 	}
 }
